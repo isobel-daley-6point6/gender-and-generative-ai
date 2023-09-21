@@ -1,3 +1,6 @@
 .env 
 logs/
 .ipynb_checkpoints
+.DS_Store
+charts/
+src/scripts/__pycache__/
