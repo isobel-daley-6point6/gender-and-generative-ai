@@ -1,8 +1,8 @@
-# gender-and-generative-ai
+# Investigating the Presence of Gender Bias in Text-Based Generative AI Tools
 
 ## Introduction
 
-This repository details work undertaken to explore the presence of gender bias in three text-based generative AI tools:
+This repository details the work undertaken to explore the presence of gender bias in three text-based generative AI tools:
 
 - Open AI GPT-3.5
 - Open AI GPT-4
@@ -60,7 +60,7 @@ These co-occurrence statistcs measure the strength of association between the pr
 
 A word (**w**) is considered to co-occur with a gendered word (**g**) if **w** and **g** occur within a pre-defined context window of length **c**.  This allows the generation of co-occurrence counts.  
 
-```**c(w,g)**```
+```c(w,g)```
 
 The co-occurence counts facilitate the calculation of the conditional probability of a non-gendered word (**w**) co-occurring with a gendered word (**g**).  These are returned as log values.  
 
@@ -72,6 +72,4 @@ The notebook [2.0_using_genbit_to_measure_bias.ipynb](2.0_using_genbit_to_measur
 
 ## Analysis of Results
 
-## Conclusions
-
-## References
+Results are analysed in notebook [3.0_exploring_gender_bias.ipynb](/Users/useraccount/Documents/manchester_tech_festival/gender-and-generative-ai/3.0_exploring_gender_bias.ipynb).
