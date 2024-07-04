@@ -51,7 +51,7 @@ responses = []
 
 # The prompt is run 40 times for each product
 print("Starting prompt generation...")
-for iteration in range(1):
+for iteration in range(40):
     print(f"Iteration: {iteration+1}/40")
     for product in products:
         # The search string specifies the prompt that is used
