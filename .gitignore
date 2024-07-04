@@ -4,3 +4,4 @@ logs/
 .DS_Store
 charts/
 src/scripts/__pycache__/
+data/products/__pycache__/
