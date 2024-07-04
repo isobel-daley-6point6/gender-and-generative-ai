@@ -5,3 +5,4 @@ logs/
 charts/
 src/scripts/__pycache__/
 data/products/__pycache__/
+src/scripts/gemini_basic.py
