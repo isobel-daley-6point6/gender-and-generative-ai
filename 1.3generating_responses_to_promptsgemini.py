@@ -1,14 +1,6 @@
 ## Import Libraries & Load Environment Variables
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
-import time
-from selenium.webdriver.chrome.options import Options
-from selenium.common.exceptions import NoSuchElementException, TimeoutException, WebDriverException
 import os
-import logging
 from dotenv import load_dotenv
-import requests
 from datetime import datetime
 import json
 from pathlib import Path
@@ -47,27 +39,12 @@ if not api_key:
     print("Error: GEMINI_API_KEY not found in environment variables")
     sys.exit(1)
 
-# Set selenium options
-options = Options()
-options.add_argument("--headless")
-options.add_argument("--disable-gpu")
-options.add_argument("--window-size=1920,1080")
-options.add_argument("--no-sandbox")
-options.add_argument("--disable-dev-shm-usage")
-
-# Initialize the Chrome WebDriver
-try:
-    driver = webdriver.Chrome(options=options)
-except WebDriverException as e:
-    print("Error initializing WebDriver: ", e)
-    sys.exit(1)
-
 # Preview list of products
 print("Products:", products)
 
 ## Generate Responses
 # Initiate query object
-query_object = QueryGemini(api_key=api_key, web_driver=driver)
+query_object = QueryGemini(api_key=api_key)
 
 # Create empty list to store responses to the prompt
 responses = []
@@ -121,6 +98,4 @@ print(f"Saving responses to {output_file}")
 with open(output_file, "w") as out_file:
     json.dump(response_json, out_file)
 
-# Close the WebDriver
-query_object.close()
 print("Script completed successfully.")
