@@ -1,13 +1,18 @@
+# src/scripts/gemini.py
+
 import google.generativeai as genai
-import os
 
-os.environ["API_KEY"]=''
+class QueryGemini:
+    def __init__(self, api_key):
+        self.api_key = api_key
+        genai.configure(api_key=self.api_key)
+        self.model = genai.GenerativeModel('gemini-1.5-flash')
 
-genai.configure(api_key=os.environ["API_KEY"])
-
-model = genai.GenerativeModel('gemini-1.5-flash')
-
-
-
-response = model.generate_content("Write a story about a AI and magic")
-print(response.text)
+    def connect_gemini(self, search_string):
+        try:
+            print(f"Generating content for prompt: {search_string}")
+            response = self.model.generate_content(search_string)
+            return response.text if response else None
+        except Exception as e:
+            print(f"Request failed: {e}")
+            return str(e)
