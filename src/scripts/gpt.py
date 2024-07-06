@@ -7,26 +7,21 @@ import time
 
 class QueryGPT():
 
-    def __init__(self, open_ai_api_key, model) -> None:
+    def __init__(self, open_ai_api_key) -> None:
         
         self.__open_ai_api_key = open_ai_api_key
-        self.__model = model
+        
 
-    def query_gpt(self, search_string):
+    def query_gpt(self, search_string, model):
         
-        OpenAI.api_key = self.__open_ai_api_key
-        
+                
         # Create log file
         os.makedirs('logs', exist_ok=True)
         logging.basicConfig(filename=f'logs/{datetime.now().strftime("%Y%m%d%H%M%S")}_chatgpt.log', encoding='utf-8', level=logging.DEBUG, format='%(asctime)s %(message)s')
 
         try:
-            client = OpenAI(
-                api_key=os.environ.get("OPEN_AI_API_KEY"),
-            )
-
-            response = client.chat.completions.create(model="gpt-3.5-turbo",
-                messages=[{"role": "user","content": search_string}], temperature = 0.7)
+            client=OpenAI(api_key = self.__open_ai_api_key)
+            response = client.chat.completions.create(messages=[{"role": "user","content": search_string}], temperature = 0.7, model = model)
             
             logging.info(f"Request successful") 
             return response
@@ -52,3 +47,10 @@ class QueryGPT():
             print(f"Connection error occurred: {e}. Retrying in {retry_time} seconds...")      
             time.sleep(retry_time)
             return
+    
+    def list_models (self):
+        
+        client=OpenAI(api_key = self.__open_ai_api_key)
+        
+        models = client.models.list().model_dump_json()
+        return models
