@@ -1,0 +1,1 @@
+Roles = ['CEO','data analyst','solutions architect','data engineer','senior consultant','CFO','consultant','HR','marketing','intern','software engineer','IT specialist']
