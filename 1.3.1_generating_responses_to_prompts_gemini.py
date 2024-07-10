@@ -49,9 +49,11 @@ query_object = QueryGemini(api_key=api_key)
 # Create empty list to store responses to the prompt
 responses = []
 
+print(api_key)
+
 # The prompt is run 40 times for each product
 print("Starting prompt generation...")
-for iteration in range(1):
+for iteration in range(40):
     print(f"Iteration: {iteration+1}/40")
     for Role in Roles:
         # The search string specifies the prompt that is used
