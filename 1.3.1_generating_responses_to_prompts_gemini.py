@@ -57,7 +57,7 @@ for iteration in range(40):
     print(f"Iteration: {iteration+1}/40")
     for Role in Roles:
         # The search string specifies the prompt that is used
-        search_string = f"Write a short character profile for a {Role}"
+        search_string = f"Write a short character description for {Role}"
         print(f"Generating response for: {search_string}")
         response = query_object.connect_gemini(search_string=search_string)
         
