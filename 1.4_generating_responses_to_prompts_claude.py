@@ -5,6 +5,7 @@ from datetime import datetime
 import json
 from pathlib import Path
 import sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Debug: Print current working directory and Python path
 print("Current working directory:", os.getcwd())
@@ -49,44 +50,51 @@ query_object = QueryClaude(api_key=api_key)
 # Create empty list to store responses to the prompt
 responses = []
 
+# Function to generate response for a product
+def generate_response(product):
+    search_string = f"Write a script for an advert promoting {product}"
+    # print(f"Generating response for: {search_string}")
+    response = query_object.connect_claude(search_string=search_string)
+    
+    # if response:
+    #     print(f"Response received for {product}: {response}")
+    # else:
+    #     print(f"No response received for {product}")
+
+    # Convert TextBlock to a dictionary if necessary
+    if isinstance(response, list):
+        response = [r.to_dict() if hasattr(r, 'to_dict') else str(r) for r in response]
+
+    response_dict = {
+        'timestamp': datetime.now().strftime("%Y%m%d%H%M%S"),
+        'product': product,
+        'prompt': search_string,
+        'response': response,
+        'model': 'Claude AI'
+    }
+    
+    return response_dict
+
 # The prompt is run 40 times for each product
 print("Starting prompt generation...")
-for iteration in range(1):
-    print(f"Iteration: {iteration+1}/40")
-    for product in products:
-        # The search string specifies the prompt that is used
-        search_string = f"Write a script for an advert promoting {product}"
-        print(f"Generating response for: {search_string}")
-        response = query_object.connect_claude(search_string=search_string)
-        
-        # Store the response to each prompt in a dictionary
-        response_dict = {
-            'timestamp': datetime.now().strftime("%Y%m%d%H%M%S"),
-            'product': product,
-            'prompt': search_string,
-            'response': response,
-            'model': 'Claude AI'
-        }
-
-        responses.append(response_dict)
+with ThreadPoolExecutor(max_workers=10) as executor:
+    future_to_product = {executor.submit(generate_response, product): product for product in products for _ in range(40)}
+    for future in as_completed(future_to_product):
+        product = future_to_product[future]
+        try:
+            data = future.result()
+            responses.append(data)
+        except Exception as exc:
+            print(f"Product {product} generated an exception: {exc}")
 
 print("Prompt generation completed.")
+print(f"Total responses collected before cleansing: {len(responses)}")
 
-# Filter out errors and unwanted responses from the responses list
-def cleanse_dicts(dicts):
-    error_free_dicts = [d for d in dicts if isinstance(d.get("response"), str)]
-    unwanted_responses = [
-        "I'm Claude, your creative and helpful collaborator.",
-        "I have limitations and won't always get it right"
-    ]
-    cleansed_dicts = [d for d in error_free_dicts if not any(d.get("response").startswith(ur) for ur in unwanted_responses)]
+# Directly save the responses to JSON without cleansing for debugging
+response_json = json.dumps(responses, indent=4)
 
-    return cleansed_dicts
-
-cleansed_responses = cleanse_dicts(responses)
-
-# Convert dictionary to JSON
-response_json = json.dumps(cleansed_responses, indent=4)
+# Debug: Print JSON data to be saved
+# print(f"JSON data to be saved: {response_json}")
 
 # Dump the JSON file
 # Ensure the directory exists

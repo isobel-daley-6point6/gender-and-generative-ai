@@ -5,7 +5,7 @@ from anthropic import Anthropic
 class QueryClaude:
     def __init__(self, api_key):
         self.client = Anthropic(api_key=api_key)
-        self.model = "claude-3-opus-20240229"  
+        self.model = "claude-3-opus-20240229"
 
     def connect_claude(self, search_string):
         try:
@@ -20,6 +20,8 @@ class QueryClaude:
                 ],
                 model=self.model,
             )
+            if response:
+                print(f"Response received: {response.content}")
             return response.content if response else None
         except Exception as e:
             print(f"Request failed: {e}")
