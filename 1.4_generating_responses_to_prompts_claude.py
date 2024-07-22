@@ -5,8 +5,6 @@ from datetime import datetime
 import json
 from pathlib import Path
 import sys
-import anthropic
-
 
 # Debug: Print current working directory and Python path
 print("Current working directory:", os.getcwd())
@@ -32,13 +30,13 @@ except ModuleNotFoundError as e:
     sys.exit(1)
 
 # Load environment variables from the .env file
-# The .env file is where the "CLAUDE_API_KEY" is stored
+# The .env file is where the "ANTHROPIC_API_KEY" is stored
 load_dotenv('.env')
 
-# Import the CLAUDE_API_KEY
-api_key = os.environ.get('CLAUDE_API_KEY')
+# Import the ANTHROPIC_API_KEY
+api_key = os.environ.get('ANTHROPIC_API_KEY')
 if not api_key:
-    print("Error: CLAUDE_API_KEY not found in environment variables")
+    print("Error: ANTHROPIC_API_KEY not found in environment variables")
     sys.exit(1)
 
 # Preview list of products
