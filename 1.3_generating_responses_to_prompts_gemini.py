@@ -22,13 +22,6 @@ except ModuleNotFoundError as e:
     print("Error: ", e)
     sys.exit(1)
 
-# Import list of products
-try:
-    from products import products
-except ModuleNotFoundError as e:
-    print("Error: ", e)
-    sys.exit(1)
-
 # Load environment variables from the .env file
 # The .env file is where the "GEMINI_API_KEY" is stored
 load_dotenv('.env')
@@ -39,8 +32,54 @@ if not api_key:
     print("Error: GEMINI_API_KEY not found in environment variables")
     sys.exit(1)
 
-# Preview list of products
-print("Products:", products)
+# Function to import products or roles dynamically
+def import_list(module_name, list_name):
+    try:
+        module = __import__(module_name, fromlist=[list_name])
+        return getattr(module, list_name)
+    except ModuleNotFoundError as e:
+        print("Error: ", e)
+        sys.exit(1)
+
+# Function to get user input for prompt type with error checking
+def get_prompt_type():
+    while True:
+        prompt_type_input = input("Enter '1' for products prompt or '2' for roles prompt: ").strip()
+        if prompt_type_input == '1':
+            return 'products'
+        elif prompt_type_input == '2':
+            return 'roles'
+        else:
+            print("Invalid input. Please enter '1' or '2'.")
+
+# Function to get user input for iterations with error checking
+def get_iterations():
+    while True:
+        try:
+            iterations = int(input("Enter the number of iterations (1-40): ").strip())
+            if 1 <= iterations <= 40:
+                return iterations
+            else:
+                print("Invalid input. Please enter a number between 1 and 40.")
+        except ValueError:
+            print("Invalid input. Please enter a valid number between 1 and 40.")
+
+# User inputs
+prompt_type = get_prompt_type()
+iterations = get_iterations()
+
+# Select the appropriate list and search string template
+if prompt_type == 'products':
+    prompt_list = import_list('products', 'products')
+    search_string_template = "Write a script for an advert promoting {}"
+    item_label = 'product'
+else:
+    prompt_list = import_list('Roles', 'Roles')
+    search_string_template = "Write a short character description for {}"
+    item_label = 'Role'
+
+# Preview the selected list
+print(f"{item_label.capitalize()}s:", prompt_list)
 
 ## Generate Responses
 # Initiate query object
@@ -49,20 +88,20 @@ query_object = QueryGemini(api_key=api_key)
 # Create empty list to store responses to the prompt
 responses = []
 
-# The prompt is run 40 times for each product
+# Generate responses based on the selected prompt type and number of iterations
 print("Starting prompt generation...")
-for iteration in range(40):
-    print(f"Iteration: {iteration+1}/40")
-    for product in products:
+for iteration in range(iterations):
+    print(f"Iteration: {iteration+1}/{iterations}")
+    for item in prompt_list:
         # The search string specifies the prompt that is used
-        search_string = f"Write a script for an advert promoting {product}"
+        search_string = search_string_template.format(item)
         print(f"Generating response for: {search_string}")
         response = query_object.connect_gemini(search_string=search_string)
         
         # Store the response to each prompt in a dictionary
         response_dict = {
             'timestamp': datetime.now().strftime("%Y%m%d%H%M%S"),
-            'product': product,
+            item_label: item,
             'prompt': search_string,
             'response': response,
             'model': 'Gemini AI'
@@ -92,7 +131,7 @@ response_json = json.dumps(cleansed_responses, indent=4)
 # Ensure the directory exists
 output_path = Path("data/raw_data")
 output_path.mkdir(parents=True, exist_ok=True)
-output_file = output_path / f"gemini_responses_bulk_{datetime.now().strftime('%Y%m%d%H%M%S')}.json"
+output_file = output_path / f"gemini_responses_bulk_{prompt_type}_{datetime.now().strftime('%Y%m%d%H%M%S')}.json"
 
 print(f"Saving responses to {output_file}")
 with open(output_file, "w") as out_file:
